@@ -5,9 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# -----------------------------------------------------------------
-# 1. Load data
-# -----------------------------------------------------------------
+
 df = pd.read_csv("county_fire_elevation.csv")
 df = df.dropna(subset=["mean_elevation_m", "SUM_Area_Acres"])
 
@@ -15,9 +13,7 @@ x = df["mean_elevation_m"].to_numpy(dtype=float)
 y = df["SUM_Area_Acres"].to_numpy(dtype=float)
 n = len(x)
 
-# -----------------------------------------------------------------
-# 2. Pearson correlation (pure numpy, no scipy needed)
-# -----------------------------------------------------------------
+
 r = np.corrcoef(x, y)[0, 1]
 
 # t-statistic for testing whether r is significantly different from 0
@@ -25,8 +21,7 @@ t_stat = r * math.sqrt((n - 2) / (1 - r**2))
 df_freedom = n - 2
 
 
-# --- Small self-contained implementation of the t-distribution
-#     two-tailed p-value, so we don't need scipy.stats ---
+
 def _betacf(a, b, x, max_iter=200, eps=1e-10):
     """Continued fraction for the incomplete beta function (Numerical Recipes)."""
     qab, qap, qam = a + b, a + 1.0, a - 1.0
@@ -84,9 +79,7 @@ def t_dist_two_tailed_pvalue(t_stat, deg_free):
 
 p_value = t_dist_two_tailed_pvalue(t_stat, df_freedom)
 
-# -----------------------------------------------------------------
-# 3. Linear regression (numpy.polyfit instead of scipy.stats.linregress)
-# -----------------------------------------------------------------
+
 slope, intercept = np.polyfit(x, y, 1)
 r_squared = r**2
 
@@ -100,9 +93,6 @@ if p_value < 0.05:
 else:
     print(">> Not statistically significant (p >= 0.05) — check sample size or data quality")
 
-# -----------------------------------------------------------------
-# 4. Visualization: scatter plot with regression line
-# -----------------------------------------------------------------
 sns.set_theme(style="whitegrid")
 plt.figure(figsize=(9, 6))
 
@@ -112,7 +102,6 @@ sns.regplot(
     line_kws={"color": "#7570b3"}
 )
 
-# Label the top 5 counties with the most burned acreage (outliers of interest)
 top_counties = df.nlargest(5, "SUM_Area_Acres")
 for _, row in top_counties.iterrows():
     plt.annotate(
@@ -134,9 +123,7 @@ plt.tight_layout()
 plt.savefig("elevation_wildfire_correlation.png", dpi=300, bbox_inches="tight")
 plt.show()
 
-# -----------------------------------------------------------------
-# 5. Save summary table (useful for a README table)
-# -----------------------------------------------------------------
+
 summary = df[["NAME", "mean_elevation_m", "SUM_Area_Acres"]].sort_values(
     "SUM_Area_Acres", ascending=False
 )
