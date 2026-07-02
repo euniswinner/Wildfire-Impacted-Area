@@ -1,4 +1,5 @@
 **Why this project is important**
+
 Many geography graduates go on to work in public agencies and the 
 insurance industry, where spatial risk assessment directly shapes 
 real-world decisions. For example, major insurers such as State Farm 
